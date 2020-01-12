@@ -1,5 +1,6 @@
 import React from 'react';
 import Routes from './routes';
+import './config/StatusBarConfig';
 
 // Class format of a Component
 // class App extends Component {
