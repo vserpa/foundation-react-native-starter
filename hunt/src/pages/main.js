@@ -8,7 +8,9 @@ export default class Main extends Component {
     };
 
     state = {
-        docs: []
+        docs: [],
+        productInfo: {},
+        page: 1
     }
 
     componentDidMount() {
@@ -17,11 +19,30 @@ export default class Main extends Component {
 
     // arrow function nunca cria um novo escopo de função, ele 
     // se utiliza do escopo corrente e possui acesso à this.*
-    loadProducts = async () => {
-        const response = await api.get('/products');
-        const { docs } = response.data;        
-        this.setState({ docs });
-    }
+    loadProducts = async (page) => {
+
+        if (page === undefined || page < 1)
+            page = 1;
+
+        console.log(`debug on loadProducts: ${page}`);
+        const response = await api.get(`/products?page=${page}`);
+        const { docs, ...productInfo } = response.data;
+        this.setState({ 
+            docs: [...this.state.docs, ...docs], 
+            productInfo,
+            page 
+        });
+    };
+
+    loadMore = () => {
+        const { page, productInfo } = this.state;
+        console.log(`debug on loadProducts: ${page}`);
+        console.log(`debug on loadProducts - prdinfo: ${productInfo.pages}`)
+        if (page === productInfo.pages) 
+            return;
+        const pageNumber = page + 1;
+        this.loadProducts(pageNumber);
+    };
 
     renderItem = ({ item }) => (
         <View style={styles.productContainer}>
@@ -41,6 +62,8 @@ export default class Main extends Component {
                     data={this.state.docs}
                     keyExtractor={item => item._id}
                     renderItem={this.renderItem}
+                    onEndReached={this.loadMore}
+                    onEndReachedThreshold={0.1}
                 />
             </View>
         )
