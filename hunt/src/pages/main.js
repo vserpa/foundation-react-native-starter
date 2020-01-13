@@ -7,6 +7,10 @@ export default class Main extends Component {
         title: 'JS Hunt'
     };
 
+    state = {
+        docs: []
+    }
+
     componentDidMount() {
         this.loadProducts();
     }
@@ -15,14 +19,17 @@ export default class Main extends Component {
     // se utiliza do escopo corrente e possui acesso à this.*
     loadProducts = async () => {
         const response = await api.get('/products');
-        const { docs } = response.data;
-        console.log(docs);
+        const { docs } = response.data;        
+        this.setState({ docs });
     }
 
     render() {
         return (
             <View>
                 <Text>Main Page</Text>
+                {this.state.docs.map(product => (
+                    <Text key={product._id}>{product.title}</Text>
+                ))}
             </View>
         )
     }
